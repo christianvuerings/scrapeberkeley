@@ -5,9 +5,21 @@ require 'rubygems'
 require 'sinatra/base'
 require 'sinatra/json'
 
-def fetch_courses
+def term t
+  lookup = {
+    "fall" => 'FL',
+    "spring" => 'SP',
+    "summer" => 'SU'
+  }
+  lookup.default = 'FL'
+  lookup[t]
+end
 
-  url = 'http://osoc.berkeley.edu/OSOC/osoc?p_term=SP&p_list_all=Y'
+def fetch_courses params
+
+  t = term params['term']
+  url = "http://osoc.berkeley.edu/OSOC/osoc?p_term=#{t}&p_list_all=Y"
+  puts url
 
   agent = Mechanize.new
   agent.log = Logger.new 'berkeley.log'
@@ -64,9 +76,11 @@ end
 class MyApp < Sinatra::Base
   helpers Sinatra::JSON
 
-  get '/' do
-    #'test'
-    json :list => fetch_courses
+  # Display the Berkeley schedule for a specific semester
+  get '/api/schedule' do
+    params = request.env['rack.request.query_hash']
+    puts params
+    json :list => fetch_courses(params)
   end
 end
 
