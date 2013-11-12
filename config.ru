@@ -1,2 +1,2 @@
-require './berkeley4.rb'
-run MyApp
+require './berkeley.rb'
+run ScrapeBerkeley
